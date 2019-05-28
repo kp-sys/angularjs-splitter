@@ -7,9 +7,9 @@ module.exports = (env, {mode}) => ({
     mode: 'none',
 
     entry: mode === 'production' ? {
-        'angularjs-splitter.min': ['./src/angularjs-splitter/angularjs-splitter.module.ts']
+        'angularjs-splitter.min': ['./src/angularjs-splitter/splitter.module.ts']
     } : {
-        'angularjs-splitter': ['./src/angularjs-splitter/angularjs-splitter.module.ts']
+        'angularjs-splitter': ['./src/angularjs-splitter/splitter.module.ts']
     },
 
     output: {

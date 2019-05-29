@@ -142,6 +142,42 @@ export class SplitterComponentController implements IPostLink, IOnDestroy {
     }
 }
 
+/**
+ * @ngdoc component
+ * @name kpSplitter
+ * @module angularjs-splitter
+ *
+ * @param {TSplitterOrientation} orientation Orientation of inner {@link component:kpSplitterPane panes}. `'vertical'` is panes above one another. `'horizontal'` is panes side by side.
+ *
+ * @description
+ * Component for split areas with dynamic border. See example.
+ *
+ * @example
+ * <example name="kpSplitterExample" module="kpSplitterExample" frame-no-resize="true">
+ *     <file name="index.html">
+ *      <main>
+ *          <kp-splitter orientation="horizontal">
+ *              <kp-splitter-pane min-size="100" init-size="200">
+ *                  <div class="pane-container">Pane 1</div>
+ *              </kp-splitter-pane>
+ *              <kp-splitter-pane min-size="100">
+ *                  <kp-splitter orientation="vertical">
+ *                      <kp-splitter-pane min-size="100" init-size="300">
+ *                          <div class="pane-container">Pane 2</div>
+ *                      </kp-splitter-pane>
+ *                      <kp-splitter-pane min-size="100">
+ *                          <div class="pane-containe">Pane 3</div>
+ *                      </kp-splitter-pane>
+ *                  </kp-splitter>
+ *              </kp-splitter-pane>
+ *          </kp-splitter>
+ *      </main>
+ *     </file>
+ *     <file name="script.js">
+ *          angular.module('kpSplitterExample', ['angularjs-splitter']);
+ *     </file>
+ * </example>
+ */
 export default class SplitterComponent {
     public static componentName = 'kpSplitter';
 
@@ -157,3 +193,13 @@ export default class SplitterComponent {
 
     public controller = SplitterComponentController;
 }
+
+/**
+ * @ngdoc type
+ * @name TSplitterOrientation
+ * @module angularjs-splitter
+ *
+ * @description
+ * kpSplitter orientation: `'vertical' | 'horizontal'`;
+ */
+export type TSplitterOrientation = 'vertical' | 'horizontal';

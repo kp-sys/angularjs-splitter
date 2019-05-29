@@ -24,6 +24,18 @@ export class PaneComponentController implements IPostLink {
 
 }
 
+/**
+ * @ngdoc component
+ * @name kpSplitterPane
+ * @module angularjs-splitter
+ *
+ * @requires ^kpSplitter
+ *
+ * @param {number=} minSize Minimum size of pane in pixels.
+ * @param {number=} initSize Initial size of pane in pixels. If not specified, panes will have `width: 50%`.
+ *
+ *
+ */
 export default class PaneComponent {
     public static componentName = 'kpSplitterPane';
 

@@ -276,6 +276,42 @@ __decorate([bind_decorator_1.default], SplitterComponentController.prototype, "d
 __decorate([bind_decorator_1.default], SplitterComponentController.prototype, "dragend", null);
 
 exports.SplitterComponentController = SplitterComponentController;
+/**
+ * @ngdoc component
+ * @name kpSplitter
+ * @module angularjs-splitter
+ *
+ * @param {TSplitterOrientation} orientation Orientation of inner {@link component:kpSplitterPane panes}. `'vertical'` is panes above one another. `'horizontal'` is panes side by side.
+ *
+ * @description
+ * Component for split areas with dynamic border. See example.
+ *
+ * @example
+ * <example name="kpSplitterExample" module="kpSplitterExample" frame-no-resize="true">
+ *     <file name="index.html">
+ *      <main>
+ *          <kp-splitter orientation="horizontal">
+ *              <kp-splitter-pane min-size="100" init-size="200">
+ *                  <div class="pane-container">Pane 1</div>
+ *              </kp-splitter-pane>
+ *              <kp-splitter-pane min-size="100">
+ *                  <kp-splitter orientation="vertical">
+ *                      <kp-splitter-pane min-size="100" init-size="300">
+ *                          <div class="pane-container">Pane 2</div>
+ *                      </kp-splitter-pane>
+ *                      <kp-splitter-pane min-size="100">
+ *                          <div class="pane-containe">Pane 3</div>
+ *                      </kp-splitter-pane>
+ *                  </kp-splitter>
+ *              </kp-splitter-pane>
+ *          </kp-splitter>
+ *      </main>
+ *     </file>
+ *     <file name="script.js">
+ *          angular.module('kpSplitterExample', ['angularjs-splitter']);
+ *     </file>
+ * </example>
+ */
 
 var SplitterComponent = function SplitterComponent() {
   _classCallCheck(this, SplitterComponent);
@@ -318,6 +354,12 @@ var angularjs_register_1 = __webpack_require__(4);
 var pane_component_1 = __webpack_require__(5);
 
 var splitter_component_1 = __webpack_require__(0);
+/**
+ * @ngdoc module
+ * @name angularjs-splitter
+ * @module angularjs-splitter
+ */
+
 
 exports.default = angularjs_register_1.default('angularjs-splitter').component(pane_component_1.default.componentName, pane_component_1.default).component(splitter_component_1.default.componentName, splitter_component_1.default).name();
 
@@ -380,6 +422,18 @@ function () {
 }();
 
 exports.PaneComponentController = PaneComponentController;
+/**
+ * @ngdoc component
+ * @name kpSplitterPane
+ * @module angularjs-splitter
+ *
+ * @requires ^kpSplitter
+ *
+ * @param {number=} minSize Minimum size of pane in pixels.
+ * @param {number=} initSize Initial size of pane in pixels. If not specified, panes will have `width: 50%`.
+ *
+ *
+ */
 
 var PaneComponent = function PaneComponent() {
   _classCallCheck(this, PaneComponent);

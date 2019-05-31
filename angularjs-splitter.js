@@ -127,6 +127,8 @@ var bind_decorator_1 = __webpack_require__(6);
 
 var angular = __webpack_require__(7);
 
+var LOCAL_STORAGE_PREFIX = "kpSplitter-";
+
 var SplitterComponentController =
 /*#__PURE__*/
 function () {
@@ -197,10 +199,13 @@ function () {
         throw new Error('Second pane cannot have init-size attribute');
       }
 
-      if (initPane1) {
-        this.handler.css(initLOrR, "".concat(pane1.initSize, "px"));
-        pane1.element.css(initWOrH, "".concat(pane1.initSize, "px"));
-        pane2.element.css(initLOrR, "".concat(pane1.initSize, "px"));
+      var preservedInitSize = parseInt(localStorage.getItem("".concat(LOCAL_STORAGE_PREFIX).concat(this.preserveSizeId)), 10);
+      var pane1InitSize = preservedInitSize || pane1.initSize;
+
+      if (initPane1 || preservedInitSize) {
+        this.handler.css(initLOrR, "".concat(pane1InitSize, "px"));
+        pane1.element.css(initWOrH, "".concat(pane1InitSize, "px"));
+        pane2.element.css(initLOrR, "".concat(pane1InitSize, "px"));
       }
 
       this.$element.on('mousemove', this.drag);
@@ -251,6 +256,10 @@ function () {
         this.panes[1].element.css('left', "".concat(pos, "px"));
       }
 
+      if (this.preserveSizeId) {
+        localStorage.setItem("".concat(LOCAL_STORAGE_PREFIX).concat(this.preserveSizeId), "".concat(pos));
+      }
+
       this.$scope.$apply();
     }
   }, {
@@ -282,20 +291,22 @@ exports.SplitterComponentController = SplitterComponentController;
  * @module angularjs-splitter
  *
  * @param {TSplitterOrientation} orientation Orientation of inner {@link component:kpSplitterPane panes}. `'vertical'` is panes above one another. `'horizontal'` is panes side by side.
+ * @param {string} preserveSizeId Unique ID of element under which size of element is stored in localStorage.
  *
  * @description
  * Component for split areas with dynamic border. See example.
+ * If `preserve-size-id` is given, component stores actual size value in localStorage and after reload, size is restored.
  *
  * @example
  * <example name="kpSplitterExample" module="kpSplitterExample" frame-no-resize="true">
  *     <file name="index.html">
- *      <main>
+ *      <main style="width: 100%; height: 500px;">
  *          <kp-splitter orientation="horizontal">
  *              <kp-splitter-pane min-size="100" init-size="200">
  *                  <div class="pane-container">Pane 1</div>
  *              </kp-splitter-pane>
  *              <kp-splitter-pane min-size="100">
- *                  <kp-splitter orientation="vertical">
+ *                  <kp-splitter orientation="vertical" preserve-size-id="vertical-splitter">
  *                      <kp-splitter-pane min-size="100" init-size="300">
  *                          <div class="pane-container">Pane 2</div>
  *                      </kp-splitter-pane>
@@ -317,7 +328,8 @@ var SplitterComponent = function SplitterComponent() {
   _classCallCheck(this, SplitterComponent);
 
   this.bindings = {
-    orientation: '@'
+    orientation: '@',
+    preserveSizeId: '@?'
   };
   this.transclude = true;
   this.require = {

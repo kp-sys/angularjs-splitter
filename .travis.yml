@@ -27,12 +27,16 @@ deploy:
     keep-history: true
     local_dir: "docs"
     on:
-      branch: master
+      branch:
+        - master
+        - /^v.*$/
 
   - provider: npm
     email: "tomas.dostal@kpsys.cz"
     api_key: $NPM_TOKEN
     skip_cleanup: true
     on:
-      branch: master
+      branch:
+        - master
+        - /^v.*$/
       tags: true

@@ -31,6 +31,7 @@
         "webpack.library.config.js",
         "tsconfig.json"
     ],
+    "types": "dist/angularjs-splitter.d.ts",
     "devDependencies": {
         "@babel/core": "latest",
         "@babel/preset-env": "latest",
@@ -43,11 +44,12 @@
         "angular-mocks": "latest",
         "babel-loader": "latest",
         "babel-plugin-angularjs-annotate": "latest",
-        "bind-decorator": "^1.0.11",
+        "bind-decorator": "latest",
         "clean-webpack-plugin": "latest",
         "css-loader": "latest",
         "dgeni": "latest",
         "dgeni-alive": "latest",
+        "dts-generator": "latest",
         "file-loader": "latest",
         "grunt": "latest",
         "grunt-cli": "latest",
@@ -92,10 +94,11 @@
         "lib:prod": "webpack --config webpack.library.config.js --mode production --progress",
         "lib:devel": "webpack --config webpack.library.config.js --mode development --watch --progress",
         "lib:profile": "webpack --config webpack.library.config.js --mode production --progress --profiloe --json > reports/build-statistics.json",
+        "lib:dts": "grunt dtsGenerator",
         "demo": "webpack-dev-server --config webpack.demo.config.js --progress",
         "docs:build": "grunt docs:build",
         "docs:watch": "grunt docs:watch",
-        "docs:serve": "http-server docs -p 3001 ",
+        "docs:serve": "http-server docs -p 3001",
         "test": "karma start test/karma.conf.js"
     }
 }

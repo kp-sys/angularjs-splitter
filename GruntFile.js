@@ -60,6 +60,16 @@ module.exports = (grunt) => {
                     'src/**/*.ngdoc'
                 ]
             }
+        },
+        dtsGenerator: {
+            options: {
+                project: '.',
+                out: 'dist/angularjs-splitter.d.ts',
+                exclude: ['node_modules/**/*.*', 'demo/**/*.*']
+            },
+            default: {
+                src: [ 'src/angularjs-splitter/**/*.ts' ]
+            }
         }
     });
 
@@ -67,6 +77,7 @@ module.exports = (grunt) => {
     grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('dgeni-alive');
     grunt.loadNpmTasks('grunt-contrib-watch');
+    grunt.loadNpmTasks('dts-generator');
 
     grunt.registerTask('docs:build', ['extract-comments', 'copy', 'dgeni-alive']);
     grunt.registerTask('docs:watch', ['watch']);

@@ -17,6 +17,7 @@ install:
 script:
   - npm run lib:prod
   - npm test
+  - npm run lib:dts
   - EXAMPLES_SCRIPTS_URL_PREFIX="https://dostaltomas.github.io/angularjs-splitter" npm run docs:build
 
 deploy:

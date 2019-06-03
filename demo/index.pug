@@ -5,15 +5,32 @@ html
         title Splitter Demo
         link(rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css")
 
-    body(ng-app="app")
+        style.
+            .pane1 {
+                background-color: #fb6542;
+            }
+
+            .pane2 {
+                background-color: #ffbb00;
+            }
+
+            .pane3 {
+                background-color: #3f681c;
+            }
+
+            .split-handler {
+                background-color: #375e97;
+            }
+    body(ng-app="app" ng-controller="demoController as dc")
         h1 Splitter Demo
         main
             kp-splitter(orientation="horizontal")
-                kp-splitter-pane(min-size="100" init-size="200")
+                kp-splitter-pane.pane1(min-size="100" init-size="200" show="true")
                     .pane-container Pane 1
-                kp-splitter-pane(min-size="100")
-                    kp-splitter(orientation="vertical" preserve-size-id="splitter2")
-                        kp-splitter-pane(min-size="100")
+                kp-splitter-pane(min-size="100" show="true")
+                    kp-splitter(orientation="vertical" preserve-size-id="splitter-size")
+                        kp-splitter-pane.pane2(min-size="100" init-size="200" show="true")
                             .pane-container Pane 2
-                        kp-splitter-pane(min-size="100")
+                        kp-splitter-pane.pane3(min-size="100" show="true")
                             .pane-container Pane 3
+

@@ -1,38 +1,44 @@
-import {IAugmentedJQuery, IDocumentService, IOnDestroy, IPostLink, IScope, ITranscludeFunction} from 'angular';
+import {
+    IAugmentedJQuery,
+    ICompileService,
+    IDocumentService,
+    IOnDestroy,
+    IPostLink,
+    IScope,
+    ITranscludeFunction
+} from 'angular';
 import {PaneComponentController} from './pane.component';
 import bind from 'bind-decorator';
 import angular = require('angular');
 
+type TTopOrLeft = 'top' | 'left';
+type TWidthOrHeight = 'width' | 'height';
+
 const LOCAL_STORAGE_PREFIX = `kpSplitter-`;
 
-export class SplitterComponentController implements IPostLink, IOnDestroy {
-    public orientation: string;
-    public enabled: boolean;
+export class SplitterComponentController implements SplitterBindings, IPostLink, IOnDestroy {
+    public orientation: TSplitterOrientation;
     public preserveSizeId: string;
+    public enabled: boolean;
+    public showSplitHandler: boolean;
     private panes: PaneComponentController[];
     private handler: IAugmentedJQuery;
     private vertical: boolean;
     private dragged: boolean;
+    private topOrLeft: TTopOrLeft;
+    private widthOrHeight: TWidthOrHeight;
+    private lastPosition: number;
 
     /*@ngInject*/
-    constructor(private $document: IDocumentService, private $element: IAugmentedJQuery, private $scope: IScope, $transclude: ITranscludeFunction) {
+    constructor(private $document: IDocumentService, private $element: IAugmentedJQuery, private $scope: IScope, $transclude: ITranscludeFunction, private $compile: ICompileService) {
         this.panes = [];
         this.enabled = false;
         this.dragged = false;
+        this.showSplitHandler = true;
 
         $transclude((clone) => {
             $element.append(clone);
         });
-    }
-
-    public addPane(pane: PaneComponentController): number {
-        if (this.panes.length > 1) {
-            throw new Error('splitters can only have two panes');
-        }
-
-        this.panes.push(pane);
-
-        return this.panes.length;
     }
 
     public $postLink(): void {
@@ -47,28 +53,44 @@ export class SplitterComponentController implements IPostLink, IOnDestroy {
         this.$document.off('mouseup', this.dragend);
     }
 
+    public togglePane(isVisible: boolean) {
+        this.panes.forEach((pane) => {
+            pane.$element.toggleClass(`split-pane${pane.index}`, isVisible);
+        });
+
+        this.setPosition(isVisible ? this.lastPosition : null, false);
+        this.showSplitHandler = isVisible;
+    }
+
+    public addPane(pane: PaneComponentController): number {
+        if (this.panes.length > 1) {
+            throw new Error('splitters can only have two panes');
+        }
+
+        this.panes.push(pane);
+
+        return this.panes.length;
+    }
+
     private initComponent() {
-        this.handler = angular.element('<div class="split-handler"></div>');
+        this.handler = this.$compile('<div class="split-handler" ng-show="$ctrl.showSplitHandler"></div>')(this.$scope);
         this.vertical = this.orientation === 'vertical';
 
         this.$element.addClass('split-panes');
 
         const pane1 = this.panes[0];
-        const pane2 = this.panes[1];
 
-        pane1.element.after(this.handler);
+        pane1.$element.after(this.handler);
 
         const initPane1 = (!isNaN(pane1.initSize));
-        const initPane2 = (!isNaN(pane2.initSize));
-        let initLOrR: string;
-        let initWOrH: string;
+        const initPane2 = (!isNaN(this.panes[1].initSize));
 
         if (this.vertical) {
-            initLOrR = 'top';
-            initWOrH = 'height';
+            this.topOrLeft = 'top';
+            this.widthOrHeight = 'height';
         } else {
-            initLOrR = 'left';
-            initWOrH = 'width';
+            this.topOrLeft = 'left';
+            this.widthOrHeight = 'width';
         }
 
         if (initPane2) {
@@ -79,14 +101,29 @@ export class SplitterComponentController implements IPostLink, IOnDestroy {
         const pane1InitSize = preservedInitSize || pane1.initSize;
 
         if (initPane1 || preservedInitSize) {
-            this.handler.css(initLOrR, `${pane1InitSize}px`);
-            pane1.element.css(initWOrH, `${pane1InitSize}px`);
-            pane2.element.css(initLOrR, `${pane1InitSize}px`);
+            this.setPosition(pane1InitSize);
         }
+
+        this.togglePane(this.panes[0].show && this.panes[1].show);
 
         this.$element.on('mousemove', this.drag);
         this.handler.on('mousedown', this.dragstart);
         this.$document.on('mouseup', this.dragend);
+    }
+
+    // If null, CSS rule will be removed
+    private setPosition(position: number | null, setLastPosition: boolean = true) {
+        const handlerSize = this.orientation === 'vertical' ? this.handler[0].getBoundingClientRect().height
+                                                            : this.handler[0].getBoundingClientRect().width;
+
+        this.lastPosition = setLastPosition ? position : this.lastPosition;
+
+        const pane1Value = position ? `${position}px` : '';
+        const pane2Value = position ? `${position + handlerSize}px` : '';
+
+        this.handler.css(this.topOrLeft, pane1Value);
+        this.panes[0].$element.css(this.widthOrHeight, pane1Value);
+        this.panes[1].$element.css(this.topOrLeft, pane2Value);
     }
 
     @bind
@@ -96,45 +133,41 @@ export class SplitterComponentController implements IPostLink, IOnDestroy {
         }
 
         const bounds = this.$element[0].getBoundingClientRect();
-        let pos = 0;
+        let position = 0;
         const pane1Min = this.panes[0].minSize || 0;
         const pane2Min = this.panes[1].minSize || 0;
 
         if (this.vertical) {
             const height = bounds.bottom - bounds.top;
-            pos = event.clientY - bounds.top;
+            position = event.clientY - bounds.top;
 
-            if (pos < pane1Min) {
+            if (position < pane1Min) {
                 return;
             }
 
-            if (height - pos < pane2Min) {
+            if (height - position < pane2Min) {
                 return;
             }
 
-            this.handler.css('top', `${pos}px`);
-            this.panes[0].element.css('height', `${pos}px`);
-            this.panes[1].element.css('top', `${pos}px`);
+            this.setPosition(position);
 
         } else {
             const width = bounds.right - bounds.left;
-            pos = event.clientX - bounds.left;
+            position = event.clientX - bounds.left;
 
-            if (pos < pane1Min) {
+            if (position < pane1Min) {
                 return;
             }
 
-            if (width - pos < pane2Min) {
+            if (width - position < pane2Min) {
                 return;
             }
 
-            this.handler.css('left', `${pos}px`);
-            this.panes[0].element.css('width', `${pos}px`);
-            this.panes[1].element.css('left', `${pos}px`);
+            this.setPosition(position);
         }
 
         if (this.preserveSizeId) {
-            localStorage.setItem(`${LOCAL_STORAGE_PREFIX}${this.preserveSizeId}`, `${pos}`);
+            localStorage.setItem(`${LOCAL_STORAGE_PREFIX}${this.preserveSizeId}`, `${position}`);
         }
 
         this.$scope.$apply();
@@ -216,3 +249,8 @@ export default class SplitterComponent {
  * kpSplitter orientation: `'vertical' | 'horizontal'`;
  */
 export type TSplitterOrientation = 'vertical' | 'horizontal';
+
+export interface SplitterBindings {
+    orientation: TSplitterOrientation;
+    preserveSizeId?: string;
+}

@@ -60,10 +60,10 @@ module.exports = (config) => {
                 emitWarning: false,
 
                 global: {
-                    statements: 90,
-                    lines: 90,
-                    branches: 80,
-                    functions: 90
+                    statements: 70,
+                    lines: 70,
+                    branches: 60,
+                    functions: 80
                 }
             }
         }

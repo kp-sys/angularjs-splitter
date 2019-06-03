@@ -1,3 +1,7 @@
+/**
+ * Inspired by: https://github.com/blackgate/bg-splitter
+ */
+
 import './splitter.less';
 
 import register from '@kpsys/angularjs-register';

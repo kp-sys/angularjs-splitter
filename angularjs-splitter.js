@@ -213,7 +213,7 @@ function () {
       }
 
       this.togglePane(this.panes.reduce(function (acc, pane) {
-        return acc && !pane.hide;
+        return acc && pane.show;
       }, true));
       this.$element.on('mousemove', this.drag);
       this.handler.on('mousedown', this.dragstart);
@@ -439,6 +439,11 @@ function () {
   }
 
   _createClass(PaneComponentController, [{
+    key: "$onInit",
+    value: function $onInit() {
+      this.show = true;
+    }
+  }, {
     key: "$postLink",
     value: function $postLink() {
       this.index = this.splitterController.addPane(this);
@@ -447,12 +452,12 @@ function () {
   }, {
     key: "$onChanges",
     value: function $onChanges(onChangesObj) {
-      if (onChangesObj.hide && onChangesObj.hide.currentValue !== undefined) {
-        if (!onChangesObj.hide.isFirstChange()) {
-          this.splitterController.togglePane(onChangesObj.hide.currentValue);
+      if (onChangesObj.show && onChangesObj.show.currentValue !== undefined) {
+        if (!onChangesObj.show.isFirstChange()) {
+          this.splitterController.togglePane(onChangesObj.show.currentValue);
         }
 
-        this.$element.toggleClass('ng-hide', !onChangesObj.hide.currentValue);
+        this.$element.toggleClass('ng-hide', !onChangesObj.show.currentValue);
       }
     }
   }]);
@@ -470,7 +475,7 @@ exports.PaneComponentController = PaneComponentController;
  *
  * @param {number=} minSize Minimum size of pane in pixels.
  * @param {number=} initSize Initial size of pane in pixels. If not specified, panes will have `width: 50%`.
- * @param {boolean=} hide If `true`, pane will hide.
+ * @param {boolean=} show If `false`, pane will hide. Default is `true`.
  *
  *
  */
@@ -482,7 +487,7 @@ var PaneComponent = function PaneComponent() {
   this.bindings = {
     minSize: '<',
     initSize: '<',
-    hide: '<'
+    show: '<'
   };
   this.require = {
     splitterController: "^".concat(splitter_component_1.default.componentName)

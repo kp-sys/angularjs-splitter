@@ -8,7 +8,7 @@
  *
  * @param {number=} minSize Minimum size of pane in pixels.
  * @param {number=} initSize Initial size of pane in pixels. If not specified, panes will have `width: 50%`.
- * @param {boolean=} hide If `true`, pane will hide.
+ * @param {boolean=} show If `false`, pane will hide. Default is `true`.
  *
  *
  *//*@ngInject*/

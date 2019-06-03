@@ -1,13 +1,13 @@
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
-		module.exports = factory(require("@kpsys/angularjs-register"), require("angular"));
+		module.exports = factory(require("@kpsys/angularjs-register"));
 	else if(typeof define === 'function' && define.amd)
-		define(["@kpsys/angularjs-register", "angular"], factory);
+		define(["@kpsys/angularjs-register"], factory);
 	else if(typeof exports === 'object')
-		exports["angularjs-splitter"] = factory(require("@kpsys/angularjs-register"), require("angular"));
+		exports["angularjs-splitter"] = factory(require("@kpsys/angularjs-register"));
 	else
-		root["angularjs-splitter"] = factory(root["@kpsys/angularjs-register"], root["angular"]);
-})(window, function(__WEBPACK_EXTERNAL_MODULE__4__, __WEBPACK_EXTERNAL_MODULE__7__) {
+		root["angularjs-splitter"] = factory(root["@kpsys/angularjs-register"]);
+})(window, function(__WEBPACK_EXTERNAL_MODULE__4__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -125,22 +125,22 @@ Object.defineProperty(exports, "__esModule", {
 
 var bind_decorator_1 = __webpack_require__(6);
 
-var angular = __webpack_require__(7);
-
 var LOCAL_STORAGE_PREFIX = "kpSplitter-";
 
 var SplitterComponentController =
 /*#__PURE__*/
 function () {
-  SplitterComponentController.$inject = ["$document", "$element", "$scope", "$transclude"];
+  SplitterComponentController.$inject = ["$document", "$element", "$scope", "$transclude", "$compile"];
 
   /*@ngInject*/
-  function SplitterComponentController($document, $element, $scope, $transclude) {
+  function SplitterComponentController($document, $element, $scope, $transclude, $compile) {
     _classCallCheck(this, SplitterComponentController);
 
     this.$document = $document;
     this.$element = $element;
     this.$scope = $scope;
+    this.$compile = $compile;
+    this.showSplitHandler = true;
     this.panes = [];
     this.enabled = false;
     this.dragged = false;
@@ -160,6 +160,15 @@ function () {
       return this.panes.length;
     }
   }, {
+    key: "togglePane",
+    value: function togglePane(visibility) {
+      this.panes.forEach(function (pane) {
+        pane.$element.toggleClass("split-pane".concat(pane.index), visibility);
+      });
+      this.setPosition(visibility ? this.lastPosition : null, false);
+      this.showSplitHandler = visibility;
+    }
+  }, {
     key: "$postLink",
     value: function $postLink() {
       if (this.panes.length > 1) {
@@ -176,23 +185,20 @@ function () {
   }, {
     key: "initComponent",
     value: function initComponent() {
-      this.handler = angular.element('<div class="split-handler"></div>');
+      this.handler = this.$compile('<div class="split-handler" ng-show="$ctrl.showSplitHandler"></div>')(this.$scope);
       this.vertical = this.orientation === 'vertical';
       this.$element.addClass('split-panes');
       var pane1 = this.panes[0];
-      var pane2 = this.panes[1];
-      pane1.element.after(this.handler);
+      pane1.$element.after(this.handler);
       var initPane1 = !isNaN(pane1.initSize);
-      var initPane2 = !isNaN(pane2.initSize);
-      var initLOrR;
-      var initWOrH;
+      var initPane2 = !isNaN(this.panes[1].initSize);
 
       if (this.vertical) {
-        initLOrR = 'top';
-        initWOrH = 'height';
+        this.topOrLeft = 'top';
+        this.widthOrHeight = 'height';
       } else {
-        initLOrR = 'left';
-        initWOrH = 'width';
+        this.topOrLeft = 'left';
+        this.widthOrHeight = 'width';
       }
 
       if (initPane2) {
@@ -203,14 +209,23 @@ function () {
       var pane1InitSize = preservedInitSize || pane1.initSize;
 
       if (initPane1 || preservedInitSize) {
-        this.handler.css(initLOrR, "".concat(pane1InitSize, "px"));
-        pane1.element.css(initWOrH, "".concat(pane1InitSize, "px"));
-        pane2.element.css(initLOrR, "".concat(pane1InitSize, "px"));
+        this.setPosition(pane1InitSize);
       }
 
       this.$element.on('mousemove', this.drag);
       this.handler.on('mousedown', this.dragstart);
       this.$document.on('mouseup', this.dragend);
+    } // If null, CSS rule will be removed
+
+  }, {
+    key: "setPosition",
+    value: function setPosition(position) {
+      var setLastPosition = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
+      var value = position ? "".concat(position, "px") : '';
+      this.lastPosition = setLastPosition ? position : this.lastPosition;
+      this.handler.css(this.topOrLeft, value);
+      this.panes[0].$element.css(this.widthOrHeight, value);
+      this.panes[1].$element.css(this.topOrLeft, value);
     }
   }, {
     key: "drag",
@@ -220,44 +235,40 @@ function () {
       }
 
       var bounds = this.$element[0].getBoundingClientRect();
-      var pos = 0;
+      var position = 0;
       var pane1Min = this.panes[0].minSize || 0;
       var pane2Min = this.panes[1].minSize || 0;
 
       if (this.vertical) {
         var height = bounds.bottom - bounds.top;
-        pos = event.clientY - bounds.top;
+        position = event.clientY - bounds.top;
 
-        if (pos < pane1Min) {
+        if (position < pane1Min) {
           return;
         }
 
-        if (height - pos < pane2Min) {
+        if (height - position < pane2Min) {
           return;
         }
 
-        this.handler.css('top', "".concat(pos, "px"));
-        this.panes[0].element.css('height', "".concat(pos, "px"));
-        this.panes[1].element.css('top', "".concat(pos, "px"));
+        this.setPosition(position);
       } else {
         var width = bounds.right - bounds.left;
-        pos = event.clientX - bounds.left;
+        position = event.clientX - bounds.left;
 
-        if (pos < pane1Min) {
+        if (position < pane1Min) {
           return;
         }
 
-        if (width - pos < pane2Min) {
+        if (width - position < pane2Min) {
           return;
         }
 
-        this.handler.css('left', "".concat(pos, "px"));
-        this.panes[0].element.css('width', "".concat(pos, "px"));
-        this.panes[1].element.css('left', "".concat(pos, "px"));
+        this.setPosition(position);
       }
 
       if (this.preserveSizeId) {
-        localStorage.setItem("".concat(LOCAL_STORAGE_PREFIX).concat(this.preserveSizeId), "".concat(pos));
+        localStorage.setItem("".concat(LOCAL_STORAGE_PREFIX).concat(this.preserveSizeId), "".concat(position));
       }
 
       this.$scope.$apply();
@@ -354,6 +365,9 @@ module.exports = __webpack_require__(2);
 
 "use strict";
 
+/**
+ * Inspired by: https://github.com/blackgate/bg-splitter
+ */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -424,9 +438,16 @@ function () {
   _createClass(PaneComponentController, [{
     key: "$postLink",
     value: function $postLink() {
-      this.element = this.$element;
       this.index = this.splitterController.addPane(this);
       this.$element.addClass("split-pane".concat(this.index));
+    }
+  }, {
+    key: "$onChanges",
+    value: function $onChanges(onChangesObj) {
+      if (onChangesObj.hide && !onChangesObj.hide.isFirstChange() && onChangesObj.hide.currentValue !== undefined) {
+        this.splitterController.togglePane(onChangesObj.hide.currentValue);
+        this.$element.toggleClass('ng-hide', !onChangesObj.hide.currentValue);
+      }
     }
   }]);
 
@@ -452,8 +473,9 @@ var PaneComponent = function PaneComponent() {
 
   this.transclude = true;
   this.bindings = {
-    minSize: '=',
-    initSize: '='
+    minSize: '<',
+    initSize: '<',
+    hide: '<'
   };
   this.require = {
     splitterController: "^".concat(splitter_component_1.default.componentName)
@@ -497,12 +519,6 @@ function bind(target, propertyKey, descriptor) {
 exports.bind = bind;
 exports.default = bind;
 
-
-/***/ }),
-/* 7 */
-/***/ (function(module, exports) {
-
-module.exports = __WEBPACK_EXTERNAL_MODULE__7__;
 
 /***/ })
 /******/ ]);

@@ -10,7 +10,11 @@
  * @param {number=} initSize Initial size of pane in pixels. If not specified, panes will have `width: 50%`.
  *
  *
- *//*@ngInject*//**
+ *//*@ngInject*/
+/* If null, CSS rule will be removed*//**
+ * Inspired by: https://github.com/blackgate/bg-splitter
+ */
+/**
  * @ngdoc module
  * @name angularjs-splitter
  * @module angularjs-splitter

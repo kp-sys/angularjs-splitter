@@ -140,35 +140,16 @@ function () {
     this.$element = $element;
     this.$scope = $scope;
     this.$compile = $compile;
-    this.showSplitHandler = true;
     this.panes = [];
     this.enabled = false;
     this.dragged = false;
+    this.showSplitHandler = true;
     $transclude(function (clone) {
       $element.append(clone);
     });
   }
 
   _createClass(SplitterComponentController, [{
-    key: "addPane",
-    value: function addPane(pane) {
-      if (this.panes.length > 1) {
-        throw new Error('splitters can only have two panes');
-      }
-
-      this.panes.push(pane);
-      return this.panes.length;
-    }
-  }, {
-    key: "togglePane",
-    value: function togglePane(visibility) {
-      this.panes.forEach(function (pane) {
-        pane.$element.toggleClass("split-pane".concat(pane.index), visibility);
-      });
-      this.setPosition(visibility ? this.lastPosition : null, false);
-      this.showSplitHandler = visibility;
-    }
-  }, {
     key: "$postLink",
     value: function $postLink() {
       if (this.panes.length > 1) {
@@ -181,6 +162,25 @@ function () {
       this.$element.off('mousemove', this.drag);
       this.handler.off('mousedown', this.dragstart);
       this.$document.off('mouseup', this.dragend);
+    }
+  }, {
+    key: "togglePane",
+    value: function togglePane(isVisible) {
+      this.panes.forEach(function (pane) {
+        pane.$element.toggleClass("split-pane".concat(pane.index), isVisible);
+      });
+      this.setPosition(isVisible ? this.lastPosition : null, false);
+      this.showSplitHandler = isVisible;
+    }
+  }, {
+    key: "addPane",
+    value: function addPane(pane) {
+      if (this.panes.length > 1) {
+        throw new Error('splitters can only have two panes');
+      }
+
+      this.panes.push(pane);
+      return this.panes.length;
     }
   }, {
     key: "initComponent",
@@ -212,6 +212,9 @@ function () {
         this.setPosition(pane1InitSize);
       }
 
+      this.togglePane(this.panes.reduce(function (acc, pane) {
+        return acc && !pane.hide;
+      }, true));
       this.$element.on('mousemove', this.drag);
       this.handler.on('mousedown', this.dragstart);
       this.$document.on('mouseup', this.dragend);
@@ -444,8 +447,11 @@ function () {
   }, {
     key: "$onChanges",
     value: function $onChanges(onChangesObj) {
-      if (onChangesObj.hide && !onChangesObj.hide.isFirstChange() && onChangesObj.hide.currentValue !== undefined) {
-        this.splitterController.togglePane(onChangesObj.hide.currentValue);
+      if (onChangesObj.hide && onChangesObj.hide.currentValue !== undefined) {
+        if (!onChangesObj.hide.isFirstChange()) {
+          this.splitterController.togglePane(onChangesObj.hide.currentValue);
+        }
+
         this.$element.toggleClass('ng-hide', !onChangesObj.hide.currentValue);
       }
     }
@@ -464,6 +470,7 @@ exports.PaneComponentController = PaneComponentController;
  *
  * @param {number=} minSize Minimum size of pane in pixels.
  * @param {number=} initSize Initial size of pane in pixels. If not specified, panes will have `width: 50%`.
+ * @param {boolean=} hide If `true`, pane will hide.
  *
  *
  */

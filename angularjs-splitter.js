@@ -212,9 +212,7 @@ function () {
         this.setPosition(pane1InitSize);
       }
 
-      this.togglePane(this.panes.reduce(function (acc, pane) {
-        return acc && pane.show;
-      }, true));
+      this.togglePane(this.panes[0].show && this.panes[1].show);
       this.$element.on('mousemove', this.drag);
       this.handler.on('mousedown', this.dragstart);
       this.$document.on('mouseup', this.dragend);
@@ -224,11 +222,13 @@ function () {
     key: "setPosition",
     value: function setPosition(position) {
       var setLastPosition = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
-      var value = position ? "".concat(position, "px") : '';
+      var handlerSize = this.orientation === 'vertical' ? this.handler[0].getBoundingClientRect().height : this.handler[0].getBoundingClientRect().width;
       this.lastPosition = setLastPosition ? position : this.lastPosition;
-      this.handler.css(this.topOrLeft, value);
-      this.panes[0].$element.css(this.widthOrHeight, value);
-      this.panes[1].$element.css(this.topOrLeft, value);
+      var pane1Value = position ? "".concat(position, "px") : '';
+      var pane2Value = position ? "".concat(position + handlerSize, "px") : '';
+      this.handler.css(this.topOrLeft, pane1Value);
+      this.panes[0].$element.css(this.widthOrHeight, pane1Value);
+      this.panes[1].$element.css(this.topOrLeft, pane2Value);
     }
   }, {
     key: "drag",
@@ -433,21 +433,18 @@ function () {
     _classCallCheck(this, PaneComponentController);
 
     this.$element = $element;
+    this.show = true;
     $transclude(function (clone) {
       $element.append(clone);
     });
   }
 
   _createClass(PaneComponentController, [{
-    key: "$onInit",
-    value: function $onInit() {
-      this.show = true;
-    }
-  }, {
     key: "$postLink",
     value: function $postLink() {
       this.index = this.splitterController.addPane(this);
       this.$element.addClass("split-pane".concat(this.index));
+      this.show = this.show !== false;
     }
   }, {
     key: "$onChanges",

@@ -19,4 +19,5 @@
  * @ngdoc module
  * @name angularjs-splitter
  * @module angularjs-splitter
- */
+ *//* tslint:disable-next-line:variable-name*/
+/* tslint:disable-next-line:no-unused-expression*/

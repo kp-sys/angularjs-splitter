@@ -6,8 +6,7 @@
   bottom: 0;
   position: absolute;
 }
-.split-panes > .split-handler {
-  background: transparent;
+.split-panes .split-handler {
   position: absolute;
   z-index: 999;
 }
@@ -18,18 +17,18 @@
   bottom: 0;
   cursor: ew-resize;
 }
-.split-panes[orientation="horizontal"] > .split-pane1,
-.split-panes[orientation="horizontal"] > .split-pane2 {
+.split-panes[orientation="horizontal"] > kp-splitter-pane {
   position: absolute;
   height: 100%;
+  width: 100%;
 }
 .split-panes[orientation="horizontal"] > .split-pane1 {
   width: 50%;
 }
 .split-panes[orientation="horizontal"] > .split-pane2 {
+  width: auto;
   left: 50%;
   right: 0;
-  border-left: 1px solid #aaa;
 }
 .split-panes[orientation="vertical"] > .split-handler {
   height: 4px;
@@ -38,17 +37,17 @@
   right: 0;
   cursor: ns-resize;
 }
-.split-panes[orientation="vertical"] > .split-pane1,
-.split-panes[orientation="vertical"] > .split-pane2 {
+.split-panes[orientation="vertical"] > kp-splitter-pane {
   position: absolute;
   width: 100%;
+  height: 100%;
 }
 .split-panes[orientation="vertical"] > .split-pane1 {
   height: 50%;
 }
 .split-panes[orientation="vertical"] > .split-pane2 {
+  height: auto;
   top: 50%;
   bottom: 0;
-  border-top: 1px solid #aaa;
 }
 
